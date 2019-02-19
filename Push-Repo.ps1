@@ -15,10 +15,10 @@ git add --all
 git commit -m $commitMsg
 git push
 
-Remove-Item -Path $PSProfilePathDestination -Verbose
+# Remove-Item -Path $PSProfilePathDestination -Verbose
 
-if (Test-Path -Path $PSProfilePathDestination) {
-    throw "Error: Powershell profile was not removed from the repo: please remove it manually"
-} else {
-    Write-Host "Powershell profile copy was removed from the repo successfully"
-}
+# if (Test-Path -Path $PSProfilePathDestination) {
+#     throw "Error: Powershell profile was not removed from the repo: please remove it manually"
+# } else {
+#     Write-Host "Powershell profile copy was removed from the repo successfully"
+# }
