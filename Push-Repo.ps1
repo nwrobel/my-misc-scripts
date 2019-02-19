@@ -1,4 +1,4 @@
-$commitMsg = Read-Host -Prompt "Enter commit message: "
+$commitMsg = Read-Host -Prompt "Enter commit message"
 
 $PSProfilePath = (Split-Path -Path $profile -Parent) + "\profile.ps1"
 $Destination = (Split-Path -Path $PSScriptRoot -Parent)

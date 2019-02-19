@@ -1,1 +1,1 @@
-powershell.exe %~dp0\Syncback-backup-datastore-dsbak-prerun.ps1
+powershell -File "%~dp0\Syncback-backup-datastore-dsbak-prerun.ps1"

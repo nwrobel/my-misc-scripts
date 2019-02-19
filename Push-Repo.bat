@@ -1,0 +1,1 @@
+powershell -File "%~dp0\Push-Repo.ps1"
