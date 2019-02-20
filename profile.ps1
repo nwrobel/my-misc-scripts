@@ -6,12 +6,6 @@ function Show-PfCmdlets {
         'helpw',
         'vbon', 
         'vboff'
-        'Set-PfAzSubscription', 
-        'Set-PfAzSubscriptionForSiteAccess', 
-        'Get-PfWinRMUri',  
-        'Get-PfUsersLoggedIn',
-        'Get-PfSiteCredential',
-        'Copy-PfFileToFromRemote'
     )
 
     foreach ($cmdlet in $cmdlets) {
