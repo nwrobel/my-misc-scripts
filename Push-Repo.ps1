@@ -1,11 +1,10 @@
 $commitMsg = Read-Host -Prompt "Enter commit message"
 
 $PSProfilePathSource = (Split-Path -Path $profile -Parent) + "\profile.ps1"
-
-# TODO: $PSSscriptRoot is wrong, it's getting the home dir and not the repo folder under the home dir
-$PSProfilePathDestination = (Split-Path -Path $PSScriptRoot -Parent) + "\profile.ps1"
+$PSProfilePathDestination =  "$PSScriptRoot\profile.ps1"
 
 Copy-Item -Path $PSProfilePathSource -Destination $PSProfilePathDestination -Verbose
+Start-Sleep -Seconds 3
 
 if (Test-Path -Path $PSProfilePathDestination) {
     Write-Host "Powershell profile copied into repo successfully"
@@ -17,6 +16,7 @@ git add --all
 git commit -m $commitMsg
 git push
 
+Start-Sleep -Seconds 3
 Remove-Item -Path $PSProfilePathDestination -Verbose
 
 if (Test-Path -Path $PSProfilePathDestination) {
