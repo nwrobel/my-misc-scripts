@@ -1,7 +1,24 @@
-﻿$expectedStartMenuSubfolderNames = 'Audio Tools','Development','Drawing & Modeling','File Management','Internet','IT',
-                               'Media Players','Music Creation','Music Library','Office Software','Photo Tools',
-                               'Security','StartUp','System Info','Utilities & Maintenance','Video Tools',
-                               'Windows Accessories','Windows Administrative Tools','Windows System'
+﻿$expectedStartMenuSubfolderNames = @(
+'Audio Tools',
+'Development',
+'Drawing & Modeling',
+'File Management',
+'Internet',
+'IT',
+'Media Players',
+'Music Creation',
+'Music Library',
+'Office Software',
+'Photo Tools',
+'Security',
+'StartUp',
+'System Info',
+'Utilities & Maintenance',
+'Video Tools',
+'Windows Accessories',
+'Windows Administrative Tools',
+'Windows System'
+)
 
 $currentUserStartMenuPath = "$($ENV:APPDATA)\Microsoft\Windows\Start Menu\Programs"
 $systemStartMenuPath = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
