@@ -1,3 +1,7 @@
+# TODO: make this into a module, for practice in creating your own Powershell modules
+# TDOD: add inline help docs to make these cmdlets usable by others on Github - make sure that
+# "get-help" returns correct info for each cmdlet
+
 function Compress-AllDirsInFolder {
     param (
         [string]$ParentFolder
