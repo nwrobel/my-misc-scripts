@@ -11,8 +11,6 @@ git add --all
 git commit -m $commitMsg
 git push
 
-Start-Sleep -Seconds 3
-
 Write-Host "Commit pushed successfully" -ForegroundColor Green
 Write-Host "Deploying Powershell Profile from repo to apply any updates"
 
