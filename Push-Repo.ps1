@@ -13,7 +13,8 @@ git push
 
 Start-Sleep -Seconds 3
 
-Write-Host "Commit pushed successfully"
+Write-Host "Commit pushed successfully" -ForegroundColor Green
 Write-Host "Deploying Powershell Profile from repo to apply any updates"
 
-Deploy-PowershellProfile #-ForAllUsers
+Deploy-PowershellProfile -Verbose #-ForAllUsers
+Write-Host "Powershell Profile deployed successfully" -ForegroundColor Green
