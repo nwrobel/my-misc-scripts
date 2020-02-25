@@ -1,26 +1,19 @@
+$ErrorActionPreference = 'Stop'
+
+. (Join-Path $PSScriptRoot -ChildPath 'Deploy-PowershellProfile.ps1')
+
 $commitMsg = Read-Host -Prompt "Enter commit message"
 
-$PSProfilePathSource = (Split-Path -Path $profile -Parent) + "\profile.ps1"
-$PSProfilePathDestination =  "$PSScriptRoot\profile.ps1"
-
-Copy-Item -Path $PSProfilePathSource -Destination $PSProfilePathDestination -Verbose
-Start-Sleep -Seconds 3
-
-if (Test-Path -Path $PSProfilePathDestination) {
-    Write-Host "Powershell profile copied into repo successfully`n" -ForegroundColor Green
-} else {
-    throw "Error: Powershell profile was not found in the repo: exiting"
-}
+git config --global user.email "nickwrobel2@gmail.com"
+git config --global user.name "Nick Wrobel"
 
 git add --all
 git commit -m $commitMsg
 git push
 
 Start-Sleep -Seconds 3
-Remove-Item -Path $PSProfilePathDestination -Verbose
 
-if (Test-Path -Path $PSProfilePathDestination) {
-    throw "Error: Powershell profile was not removed from the repo: please remove it manually"
-} else {
-    Write-Host `n"Powershell profile copy was removed from the repo successfully" -ForegroundColor Green
-}
+Write-Host "Commit pushed successfully"
+Write-Host "Deploying Powershell Profile from repo to apply any updates"
+
+Deploy-PowershellProfile #-ForAllUsers

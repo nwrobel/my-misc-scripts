@@ -6,8 +6,7 @@
 #  'Pf' - indicated this is a profile cmdlet that can only be used for users who have my profile.
 #   If using any 'Pf' cmdlets in scripts, ensure I copy the definition of those cmdlets into the script.
 
-Write-Host "Loading Powershell profile, defined at 'C:\Users\nick.wrobel\Documents\WindowsPowerShell\profile.ps1'" -ForegroundColor Cyan
-$VerbosePreference = 'SilentlyContinue'
+Write-Host "Loading Powershell Profile: Nick Wrobel" -ForegroundColor Cyan
 
 function Show-PfCmdlets {
     Write-Host "Profile contains the following usable cmdlets & aliases:" -ForegroundColor Yellow
