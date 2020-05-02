@@ -1,6 +1,6 @@
 [reflection.assembly]::LoadWithPartialName("System.Drawing") | Out-Null
 
-function Get-ImageDateTaken {
+function Get-PhotoDateTaken {
     param (
         $ImageFilepath
     )
@@ -29,7 +29,7 @@ function Get-ImageDateTaken {
     } 
 }
 
-function Get-ImageBestDate {
+function Get-PhotoBestDate {
     param (
         $ImageFilepath
     )
@@ -38,7 +38,7 @@ function Get-ImageBestDate {
 
     $fileDateCreated = $file.CreationTime
     $fileDateModified = $file.LastWriteTime
-    $fileDateTaken = Get-ImageDateTaken -ImageFilepath $ImageFilepath
+    $fileDateTaken = Get-PhotoDateTaken -ImageFilepath $ImageFilepath
 
     $allDates = @($fileDateCreated, $fileDateModified, $fileDateTaken)
     $oldestDate = $allDates | Sort-Object -Descending | Select-Object -Last 1
@@ -46,17 +46,27 @@ function Get-ImageBestDate {
     return $oldestDate
 }
 
-function Remove-DuplicateImages {
+function Remove-DuplicatePhotos {
     param (
         $ImageRootDir
     )
 
-    $fileHashes = Get-ChildItem $ImageRootDir -Recurse | Get-FileHash -Algorithm 'SHA256'
-    $groupedFileHashes = $fileHashes | Group-Object -Property Hash
-    
+    $files = Get-ChildItem $ImageRootDir -Recurse
+    Write-Host "Found $($files.Count) total photo files"
+
+    $fileHashes = @()
+    foreach ($file in $files) {
+        $fileHashes += ($file | Get-FileHash -Algorithm 'SHA256')
+
+        $percentDone = ($fileHashes.Count / $files.Count)
+        Write-Progress -Activity "Finding duplicate photos: calculating file hashes" -PercentComplete $percentDone
+    }
+
+    $groupedFileHashes = $fileHashes | Group-Object -Property Hash    
     $duplicateFileHashes = $groupedFileHashes | Where-Object -FilterScript { $_.Count -gt 1 }
-    $duplicatesToDeleteFilepaths = @()
-    
+
+    Write-Host "Comparing duplicate photo sets to determine which photos to keep"
+    $filesToDelete = @()
     foreach ($duplicateFileHashGroup in $duplicateFileHashes) {
         $duplicateFiles = $duplicateFileHashGroup.Group
     
@@ -67,8 +77,8 @@ function Remove-DuplicateImages {
                 $keepFile = $file
             
             } else {
-                $currentFileDate = Get-ImageBestDate -ImageFilepath $file.Path
-                $currentKeepFileDate = Get-ImageBestDate -ImageFilepath $keepFile.Path
+                $currentFileDate = Get-PhotoBestDate -ImageFilepath $file.Path
+                $currentKeepFileDate = Get-PhotoBestDate -ImageFilepath $keepFile.Path
     
                 if ($currentFileDate -lt $currentKeepFileDate) {
                     $keepFile = $file
@@ -84,14 +94,15 @@ function Remove-DuplicateImages {
             } 
         }
     
-        $duplicatesToDeleteFilepaths += ($duplicateFiles | Where-Object { $_.Path -ne $keepFile.Path } | Select-Object -ExpandProperty Path)
+        $filesToDelete += ($duplicateFiles | Where-Object { $_.Path -ne $keepFile.Path } | Select-Object -ExpandProperty Path)
     }
     
-    $duplicatesToDeleteFilepaths | Remove-Item -Force
+    Write-Host "Removing the duplicate, non-desired photos found"
+    $filesToDelete | Remove-Item -Force
 
     Write-Host "`nRemoved the following duplicates (only 1 copy of each of these image files was kept):"
-    $duplicatesToDeleteFilepaths
-    Write-Host "`n$($duplicatesToDeleteFilepaths.Count) duplicate image files deleted successfully"    
+    $filesToDelete
+    Write-Host "`n$($filesToDelete.Count) duplicate image files deleted successfully"    
 }
 
-Remove-DuplicateImages -ImageRootDir "D:\Temp\photos-test\t"
+Remove-DuplicatePhotos -ImageRootDir "D:\Temp\photos-test\t"
