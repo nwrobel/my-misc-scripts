@@ -58,8 +58,8 @@ function Remove-DuplicatePhotos {
     foreach ($file in $files) {
         $fileHashes += ($file | Get-FileHash -Algorithm 'SHA256')
 
-        $percentDone = ($fileHashes.Count / $files.Count)
-        Write-Progress -Activity "Finding duplicate photos: calculating file hashes" -PercentComplete $percentDone
+        $percentDone = (($fileHashes.Count / $files.Count) * 100)
+        Write-Progress -Activity "Finding duplicate photos" -Status "Calculating file hashes" -PercentComplete $percentDone
     }
 
     $groupedFileHashes = $fileHashes | Group-Object -Property Hash    
@@ -105,4 +105,5 @@ function Remove-DuplicatePhotos {
     Write-Host "`n$($filesToDelete.Count) duplicate image files deleted successfully"    
 }
 
-Remove-DuplicatePhotos -ImageRootDir "D:\Temp\photos-test\t"
+#Remove-DuplicatePhotos -ImageRootDir "Z:\Image Library\Photos"
+Remove-DuplicatePhotos -ImageRootDir "D:\Temp\photos-test\2018"
