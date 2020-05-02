@@ -1,13 +1,21 @@
+[reflection.assembly]::LoadWithPartialName("System.Drawing") | Out-Null
+
 function Get-ImageDateTaken {
     param (
         $ImageFilepath
     )
-
-    [reflection.assembly]::LoadWithPartialName("System.Drawing") | Out-Null
-    $pic = New-Object System.Drawing.Bitmap($ImageFilepath)
+    $thisFn = $MyInvocation.MyCommand.Name
 
     try {
-        $bitearr = $pic.GetPropertyItem(36867).Value 
+        $image = New-Object System.Drawing.Bitmap($ImageFilepath)
+
+    } catch {
+        Write-Host "$($thisFn): Failed to load file as image file (no 'date taken' attribute read): $($ImageFilepath)"
+        return $null
+    }
+
+    try {
+        $bitearr = $image.GetPropertyItem(36867).Value 
         $string = [System.Text.Encoding]::ASCII.GetString($bitearr) 
         $DateTime = [datetime]::ParseExact($string,"yyyy:MM:dd HH:mm:ss`0",$Null)
 
@@ -17,7 +25,7 @@ function Get-ImageDateTaken {
         return $null
     
     } finally {
-        $pic.Dispose()
+        $image.Dispose()
     } 
 }
 
@@ -52,38 +60,38 @@ function Remove-DuplicateImages {
     foreach ($duplicateFileHashGroup in $duplicateFileHashes) {
         $duplicateFiles = $duplicateFileHashGroup.Group
     
-        $oldestFile = $null
+        $keepFile = $null
         foreach ($file in $duplicateFiles) {
             
-            if (-not $oldestFile) {
-                $oldestFile = $file
+            if (-not $keepFile) {
+                $keepFile = $file
             
             } else {
                 $currentFileDate = Get-ImageBestDate -ImageFilepath $file.Path
-                $oldestFileDate = Get-ImageBestDate -ImageFilepath $oldestFile.Path
+                $currentKeepFileDate = Get-ImageBestDate -ImageFilepath $keepFile.Path
     
-                if ($currentFileDate -lt $oldestFileDate) {
-                    $oldestFile = $file
+                if ($currentFileDate -lt $currentKeepFileDate) {
+                    $keepFile = $file
                 
                 # If the two timestamps are equal for the files, choose the one that is NOT in the form of "filename(number).ext"
                 # Files that match this form are most likely copies, made from one of the other files in the duplicate group
-                } elseif ($currentFileDate -eq $oldestFileDate) {
+                } elseif ($currentFileDate -eq $currentKeepFileDate) {
                     $fileName = (Get-Item $file.Path).Name
                     if ($fileName -notlike "*(*).*") {
-                        $oldestFile = $file
+                        $keepFile = $file
                     }
                 }
             } 
         }
     
-        $duplicatesToDeleteFilepaths += ($duplicateFiles | Where-Object { $_.Path -ne $oldestFile.Path } | Select-Object -ExpandProperty Path)
+        $duplicatesToDeleteFilepaths += ($duplicateFiles | Where-Object { $_.Path -ne $keepFile.Path } | Select-Object -ExpandProperty Path)
     }
     
     $duplicatesToDeleteFilepaths | Remove-Item -Force
 
-    Write-Host "Removed the following duplicates (only 1 copy of each of these image files was kept):"
+    Write-Host "`nRemoved the following duplicates (only 1 copy of each of these image files was kept):"
     $duplicatesToDeleteFilepaths
-    Write-Host "$($duplicatesToDeleteFilepaths.Count) duplicate image files deleted successfully"    
+    Write-Host "`n$($duplicatesToDeleteFilepaths.Count) duplicate image files deleted successfully"    
 }
 
-Remove-DuplicateImages -ImageRootDir "Z:\Image Library\Photos"
+Remove-DuplicateImages -ImageRootDir "D:\Temp\photos-test\t"
