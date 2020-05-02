@@ -1,35 +1,3 @@
-$photosFilepath = "D:\Temp\photo-utils-test"
-
-#$fileHashes = Get-ChildItem $photosFilepath -Recurse | Get-FileHash -Algorithm 'SHA256'
-$groupedFileHashes = $fileHashes | Group-Object -Property Hash
-
-$duplicateFileHashes = $groupedFileHashes | Where-Object -FilterScript { $_.Count -gt 1 }
-
-foreach ($duplicateFileHashGroup in $duplicateFileHashes) {
-    $duplicateFiles = $duplicateFileHashGroup.Group
-
-    $oldestFile = $null
-    foreach ($file in $duplicateFiles) {
-        
-        if (-not $oldestFile) {
-            $oldestFile = $file
-        
-        } else {
-            $currentFileDate = Get-ImageBestDate -ImageFilepath $file.Path
-            $oldestFileDate = Get-ImageBestDate -ImageFilepath $oldestFile.Path
-
-            if ($currentFileDate -lt $oldestFileDate) {
-                $oldestFile = $file
-            }
-        } 
-    }
-
-    Write-Host "Selected file to keep among duplicates: $($oldestFile.Path)"
-    $duplicatesToDelete = $duplicateFiles | Where-Object { $_.Path -ne $oldestFile.Path }
-
-    $duplicatesToDelete | Remove-Item -Force
-}
-
 function Get-ImageDateTaken {
     param (
         $ImageFilepath
@@ -46,7 +14,6 @@ function Get-ImageDateTaken {
         return $DateTime
     
     } catch {
-        $x = 2
         return $null
     
     } finally {
@@ -70,3 +37,53 @@ function Get-ImageBestDate {
     
     return $oldestDate
 }
+
+function Remove-DuplicateImages {
+    param (
+        $ImageRootDir
+    )
+
+    $fileHashes = Get-ChildItem $ImageRootDir -Recurse | Get-FileHash -Algorithm 'SHA256'
+    $groupedFileHashes = $fileHashes | Group-Object -Property Hash
+    
+    $duplicateFileHashes = $groupedFileHashes | Where-Object -FilterScript { $_.Count -gt 1 }
+    $duplicatesToDeleteFilepaths = @()
+    
+    foreach ($duplicateFileHashGroup in $duplicateFileHashes) {
+        $duplicateFiles = $duplicateFileHashGroup.Group
+    
+        $oldestFile = $null
+        foreach ($file in $duplicateFiles) {
+            
+            if (-not $oldestFile) {
+                $oldestFile = $file
+            
+            } else {
+                $currentFileDate = Get-ImageBestDate -ImageFilepath $file.Path
+                $oldestFileDate = Get-ImageBestDate -ImageFilepath $oldestFile.Path
+    
+                if ($currentFileDate -lt $oldestFileDate) {
+                    $oldestFile = $file
+                
+                # If the two timestamps are equal for the files, choose the one that is NOT in the form of "filename(number).ext"
+                # Files that match this form are most likely copies, made from one of the other files in the duplicate group
+                } elseif ($currentFileDate -eq $oldestFileDate) {
+                    $fileName = (Get-Item $file.Path).Name
+                    if ($fileName -notlike "*(*).*") {
+                        $oldestFile = $file
+                    }
+                }
+            } 
+        }
+    
+        $duplicatesToDeleteFilepaths += ($duplicateFiles | Where-Object { $_.Path -ne $oldestFile.Path } | Select-Object -ExpandProperty Path)
+    }
+    
+    $duplicatesToDeleteFilepaths | Remove-Item -Force
+
+    Write-Host "Removed the following duplicates (only 1 copy of each of these image files was kept):"
+    $duplicatesToDeleteFilepaths
+    Write-Host "$($duplicatesToDeleteFilepaths.Count) duplicate image files deleted successfully"    
+}
+
+Remove-DuplicateImages -ImageRootDir "Z:\Image Library\Photos"
