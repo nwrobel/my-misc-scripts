@@ -105,5 +105,5 @@ function Remove-DuplicatePhotos {
     Write-Host "`n$($filesToDelete.Count) duplicate image files deleted successfully"    
 }
 
-#Remove-DuplicatePhotos -ImageRootDir "Z:\Image Library\Photos"
-Remove-DuplicatePhotos -ImageRootDir "D:\Temp\photos-test\2018"
+Remove-DuplicatePhotos -ImageRootDir "Z:\Image Library\Photos"
+#Remove-DuplicatePhotos -ImageRootDir "D:\Temp\photos-test\2018"
