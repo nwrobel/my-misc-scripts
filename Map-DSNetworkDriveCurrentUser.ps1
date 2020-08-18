@@ -1,0 +1,1 @@
+net use Z: \\192.168.1.100\nick /persistent:yes
