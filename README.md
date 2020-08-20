@@ -1,4 +1,4 @@
-# personal-powershell-scripts
-This repo contains miscellaneous Powershell scripts I've written to use to automate various tasks I do on my desktop computer. 
+# my-misc-scripts
+This repo contains miscellaneous scripts I've written. They are generally simple one-off scripts written for a single purpose or task for me. 
 
-If any of these scripts are developed into a larger project, they will be moved to another, more suitable repo...
+If any of these scripts are developed into a larger project, they will be grouped together moved to another more suitable repo.
